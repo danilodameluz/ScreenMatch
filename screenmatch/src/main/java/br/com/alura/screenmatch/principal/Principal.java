@@ -3,12 +3,15 @@ package br.com.alura.screenmatch.principal;
 import br.com.alura.screenmatch.model.DadosEpisodio;
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
+import br.com.alura.screenmatch.model.Episodio;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -22,6 +25,7 @@ public class Principal {
         var nomeSerie = leitura.nextLine();
         var json = consumoAPI.obterDados(ENDERECO+nomeSerie.replace(" ",  "+")+APIKEY);
         DadosSerie dadosSerie = conversor.obterDados(json, DadosSerie.class);
+        System.out.println( "Série: " + dadosSerie.titulo());
         System.out.println(dadosSerie);
 
         List<DadosTemporada> temporadas = new ArrayList<>();
@@ -42,6 +46,25 @@ public class Principal {
 //        }
 
         //Pegando os títulos dos episódios com lambda
-        temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
+        //temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
+
+        List<DadosEpisodio> dadosEpisodios = temporadas.stream()
+                .flatMap(t -> t.episodios().stream())
+                .collect(Collectors.toList());
+
+        System.out.println("\nTop 5 Episódios");
+        dadosEpisodios.stream()
+                .filter(d -> !d.avaliacao().equalsIgnoreCase("N/A"))
+                .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
+                .limit(5)
+                .forEach(System.out::println);
+
+        System.out.println("\nLista de Episódios");
+        List<Episodio> episodios = temporadas.stream()
+                .flatMap(t -> t.episodios().stream()
+                        .map(d -> new Episodio(t.numero(), d)))
+                .collect(Collectors.toList());
+
+        episodios.forEach(System.out::println);
     }
 }
