@@ -1,12 +1,16 @@
 package br.com.alura.screenmatch.principal;
 
-import br.com.alura.screenmatch.model.*;
+import br.com.alura.screenmatch.model.DadosSerie;
+import br.com.alura.screenmatch.model.DadosTemporada;
+import br.com.alura.screenmatch.model.Serie;
+import br.com.alura.screenmatch.repository.SerieRepository;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -15,6 +19,11 @@ public class Principal {
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
     private final String APIKEY = "&apikey=f1540ab8";
     private List<DadosSerie> listaSeriesBuscadas = new ArrayList<>();
+    private SerieRepository repositorio;
+
+    public Principal(SerieRepository repositorio) {
+        this.repositorio = repositorio;
+    }
 
     public void exibirMenu(){
         int opcao = -1;
@@ -142,9 +151,11 @@ public class Principal {
 
     private void buscarSerieNaWeb() {
         DadosSerie dadosSerie = getDadosSerie();
-        listaSeriesBuscadas.add(dadosSerie);
-        System.out.println( "Série: " + dadosSerie.titulo());
-        System.out.println(dadosSerie);
+        Serie serie = new Serie(dadosSerie);
+        //listaSeriesBuscadas.add(dadosSerie);
+        repositorio.save(serie);
+        System.out.println("Série: " + dadosSerie.titulo());
+        System.out.println("Salva com sucesso");
     }
 
     private DadosSerie getDadosSerie(){
@@ -167,10 +178,7 @@ public class Principal {
     }
 
     private void listarSeriesBuscadas(){
-        List<Serie> series = new ArrayList<>();
-        series = listaSeriesBuscadas.stream()
-                .map(Serie::new)
-                .collect(Collectors.toList());
+        List<Serie> series = repositorio.findAll();
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenero))
                 .forEach(System.out::println);
