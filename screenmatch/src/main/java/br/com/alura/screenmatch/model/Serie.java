@@ -3,6 +3,7 @@ package br.com.alura.screenmatch.model;
 import br.com.alura.screenmatch.service.ConsultaGeminiGoogle;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
@@ -22,8 +23,8 @@ public class Serie {
     private String atores;
     private String poster;
     private String sinopse;
-    @Transient
-    private List<Episodio> episodios;
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Episodio> episodios = new ArrayList<>();
 
     public Serie() {
     }
@@ -102,14 +103,24 @@ public class Serie {
         this.sinopse = sinopse;
     }
 
+    public List<Episodio> getEpisodios() {
+        return episodios;
+    }
+
+    public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(e->e.setSerie(this));
+        this.episodios = episodios;
+    }
+
     @Override
     public String toString() {
-        return "Genero=" + genero +
-                ", titulo='" + titulo + '\'' +
+        return "Titulo='" + titulo + '\'' +
+                ", genero=" + genero +
                 ", totalTemporadas=" + totalTemporadas +
                 ", avaliacao=" + avaliacao +
                 ", atores='" + atores + '\'' +
-                ", poster='" + poster + '\'' +
-                ", sinopse='" + sinopse ;
+                ", poster='" + poster + '\''  +
+                ", episódios='" + episodios + '\''  +
+                ", sinopse='" + sinopse + '\'';
     }
 }

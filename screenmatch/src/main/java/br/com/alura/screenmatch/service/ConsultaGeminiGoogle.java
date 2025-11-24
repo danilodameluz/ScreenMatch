@@ -10,7 +10,7 @@ public class ConsultaGeminiGoogle {
         GenerateContentResponse response =
                 client.models.generateContent(
                         "gemini-2.5-flash",
-                        "Traduza para o português o texto: " + texto,
+                        "Traduza em até 250 caracteres, o texto para o português: " + texto,
                         null);
 
         return response.text();
