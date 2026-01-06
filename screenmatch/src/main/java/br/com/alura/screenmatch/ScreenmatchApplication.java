@@ -8,20 +8,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-//Implementando a interface COMMANDLINERUNNER usaremos a console como "FrontEnd" da aplicação.
-public class ScreenmatchApplication implements CommandLineRunner {
-
-    @Autowired
-    private SerieRepository repositorio;
+public class ScreenmatchApplication  {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ScreenmatchApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		Principal principal = new Principal(repositorio);
-		principal.exibirMenu();
 
-	}
 }
