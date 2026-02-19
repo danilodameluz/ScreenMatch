@@ -2,6 +2,7 @@ package br.com.alura.screenmatch.service;
 
 import br.com.alura.screenmatch.dto.EpisodioDTO;
 import br.com.alura.screenmatch.dto.SerieDTO;
+import br.com.alura.screenmatch.model.Categoria;
 import br.com.alura.screenmatch.model.Episodio;
 import br.com.alura.screenmatch.model.Serie;
 import br.com.alura.screenmatch.repository.SerieRepository;
@@ -45,11 +46,14 @@ public class SerieService {
 
         if(serie.isPresent()){
             Serie s = serie.get();
-            return s.getEpisodios().stream()
-                    .map(this::converteEpisodioEmEpisodioDTO)
-                    .collect(Collectors.toList());
+            return converteListEpsiodiosEmListEpisodiosDTO(s.getEpisodios());
         }
         return null;
+    }
+
+    public List<EpisodioDTO> obterEpisodiosPorTemporada(Long id, Integer numero) {
+        List<Episodio> episodios = repositorio.obterEpisodiosPorTemporada(id, numero);
+        return converteListEpsiodiosEmListEpisodiosDTO(episodios);
     }
 
     private List<SerieDTO> converteListSeriesEmListSeriesDTO(List<Serie> series){
@@ -71,6 +75,12 @@ public class SerieService {
         );
     }
 
+    private List<EpisodioDTO> converteListEpsiodiosEmListEpisodiosDTO(List<Episodio> episodios){
+        return episodios.stream()
+                .map(this::converteEpisodioEmEpisodioDTO)
+                .collect(Collectors.toList());
+    }
+
     private EpisodioDTO converteEpisodioEmEpisodioDTO(Episodio episodio){
         return new EpisodioDTO(
                 episodio.getTemporada(),
@@ -79,4 +89,8 @@ public class SerieService {
         );
     }
 
+    public List<SerieDTO> obterSeriePorCategoria(String categoria) {
+        Categoria genero = Categoria.fromPortugues(categoria);
+        return converteListSeriesEmListSeriesDTO(repositorio.findByGenero(genero));
+    }
 }
